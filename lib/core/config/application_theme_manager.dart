@@ -7,6 +7,15 @@ class ApplicationThemeManager {
     scaffoldBackgroundColor: const Color(
       0xFFDFECDB,
     ),
+    appBarTheme: AppBarTheme(
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      centerTitle: true,
+      toolbarHeight: 120,
+      iconTheme: IconThemeData(
+        color: Colors.white,
+      )
+    ),
     floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: primaryColor,
         shape: RoundedRectangleBorder(
@@ -73,6 +82,15 @@ class ApplicationThemeManager {
   static ThemeData darkTheme = ThemeData(
     primaryColor: primaryColor,
     scaffoldBackgroundColor: const Color(0xFF060E1E),
+    appBarTheme: AppBarTheme(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        centerTitle: true,
+        toolbarHeight: 120,
+        iconTheme: IconThemeData(
+          color: Color(0xFF060E1E),
+        )
+    ),
     bottomAppBarTheme: const BottomAppBarTheme(
       color: Color(0xFF141922),
       padding: EdgeInsets.zero,

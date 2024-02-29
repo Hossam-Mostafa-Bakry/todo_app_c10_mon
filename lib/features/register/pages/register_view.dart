@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:todo_app_c10_mon/core/services/snack_bar_service.dart';
-import 'package:todo_app_c10_mon/core/widgets/custom_text_field.dart';
 import 'package:todo_app_c10_mon/features/firebaseUtils.dart';
-import 'package:todo_app_c10_mon/features/layout_view.dart';
-import 'package:todo_app_c10_mon/features/register/pages/register_view.dart';
+import 'package:todo_app_c10_mon/features/login/pages/login_view.dart';
 
-class LoginView extends StatelessWidget {
-  static const String routeName = "login";
+import '../../../core/widgets/custom_text_field.dart';
 
+class RegisterView extends StatelessWidget {
+  static const String routeName = "register";
   var formKey = GlobalKey<FormState>();
+  var fullNameController = TextEditingController();
   var emailController = TextEditingController();
   var passwordController = TextEditingController();
+  var confirmPasswordController = TextEditingController();
 
-  LoginView({super.key});
+  RegisterView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +36,7 @@ class LoginView extends StatelessWidget {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           title: Text(
-            "Login",
+            "Create Account",
             textAlign: TextAlign.center,
             style: theme.textTheme.titleLarge,
           ),
@@ -52,14 +53,26 @@ class LoginView extends StatelessWidget {
                     height: mediaQuery.height * 0.15,
                   ),
                   Text(
-                    "Welcome back!",
-                    textAlign: TextAlign.start,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 24,
-                    ),
+                    "Full Name",
+                    style: theme.textTheme.bodySmall,
                   ),
-                  const SizedBox(height: 40),
+                  CustomTextField(
+                    controller: fullNameController,
+                    hint: "Enter your Full Name",
+                    keyboardType: TextInputType.name,
+                    hintColor: Colors.grey.shade700,
+                    suffixWidget: const Icon(Icons.person),
+                    onValidate: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return "you must enter your password";
+                      }
+                      return null;
+                    },
+                    onFieldSubmitted: (value) {
+                      print(value);
+                    },
+                  ),
+                  const SizedBox(height: 20),
                   Text(
                     "E-mail",
                     style: theme.textTheme.bodySmall,
@@ -72,7 +85,14 @@ class LoginView extends StatelessWidget {
                     suffixWidget: const Icon(Icons.email_rounded),
                     onValidate: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return "You must enter your e-mail address";
+                        return "you must enter your e-mail";
+                      }
+
+                      var regex = RegExp(
+                          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+
+                      if (!regex.hasMatch(value)) {
+                        return "Invalid email";
                       }
 
                       return null;
@@ -90,9 +110,43 @@ class LoginView extends StatelessWidget {
                     hint: "Enter your password",
                     hintColor: Colors.grey.shade700,
                     suffixWidget: const Icon(Icons.email_rounded),
+                    onChanged: (value) {
+                      print(passwordController.text);
+                    },
                     onValidate: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return "You must enter your password";
+                        return "you must enter your password";
+                      }
+
+                      var regex = RegExp(
+                          r"(?=^.{8,}$)(?=.*[!@#$%^&*]+)(?![.\\n])(?=.*[A-Z])(?=.*[a-z]).*$");
+
+                      if (!regex.hasMatch(value)) {
+                        return "The password must include at least \n* one lowercase letter, \n* one uppercase letter, \n* one digit, \n* one special character,\n* at least 8 characters long.";
+                      }
+
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    "Confirm Password",
+                    style: theme.textTheme.bodySmall,
+                  ),
+                  CustomTextField(
+                    controller: confirmPasswordController,
+                    isPassword: true,
+                    maxLines: 1,
+                    hint: "Enter your confirm password",
+                    hintColor: Colors.grey.shade700,
+                    suffixWidget: const Icon(Icons.email_rounded),
+                    onValidate: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return "you must enter your password";
+                      }
+
+                      if (value != passwordController.text) {
+                        return "password not matched";
                       }
 
                       return null;
@@ -101,25 +155,19 @@ class LoginView extends StatelessWidget {
                   const SizedBox(height: 40),
                   ElevatedButton(
                     onPressed: () {
-                      // showDialog(
-                      //   context: context,
-                      //   builder: (context) => AlertDialog(
-                      //     backgroundColor: Colors.white,
-                      //     title: Text("Loading....."),
-                      //
-                      //   ),
-                      // );
                       if (formKey.currentState!.validate()) {
-                        FirebaseUtils().loginUserAccount(
+                        FirebaseUtils()
+                            .createUserAccount(
                           emailController.text,
                           passwordController.text,
                         ).then((value) {
-                          if (value == true) {
+                          if (value) {
                             EasyLoading.dismiss();
-                            SnackBarService.showSuccessMessage("Successfully logged in");
-                            Navigator.pushReplacementNamed(
+                            SnackBarService.showSuccessMessage("Account successfully created");
+                            Navigator.pushNamedAndRemoveUntil(
                               context,
-                              LayoutView.routeName,
+                              LoginView.routeName,
+                              (route) => false,
                             );
                           }
                         });
@@ -134,7 +182,7 @@ class LoginView extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Login",
+                          "Create Account",
                           style: theme.textTheme.bodySmall
                               ?.copyWith(color: Colors.white),
                         ),
@@ -145,25 +193,6 @@ class LoginView extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    "OR",
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(
-                        context,
-                        RegisterView.routeName,
-                      );
-                    },
-                    child: Text(
-                      "Create new account !..",
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyMedium,
-                    ),
-                  )
                 ],
               ),
             ),

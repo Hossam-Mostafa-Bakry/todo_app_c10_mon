@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todo_app_c10_mon/features/firebaseUtils.dart';
+import 'package:todo_app_c10_mon/features/task_bottom_sheet.dart';
+import 'package:todo_app_c10_mon/models/task_model.dart';
 
 import 'settings_provider.dart';
 
 class LayoutView extends StatelessWidget {
-
   static const String routeName = "layout";
 
   const LayoutView({super.key});
@@ -16,7 +18,22 @@ class LayoutView extends StatelessWidget {
       extendBody: true,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            backgroundColor: Colors.transparent,
+            builder: (context) => TaskBottomSheet(),
+          );
+
+          // var data = TaskModel(
+          //   title: "play football",
+          //   description: "go to club",
+          //   isDone: false,
+          //   dateTime: DateTime.now(),
+          // );
+          //
+          // FirebaseUtils().addANewTask(data);
+        },
         child: const Icon(
           Icons.add,
           size: 32,
